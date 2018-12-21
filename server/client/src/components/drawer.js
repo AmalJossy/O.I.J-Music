@@ -136,7 +136,8 @@ class ResponsiveDrawer extends React.Component {
           </Hidden>
         </nav>
         <main className={classes.content}>
-          <div className={classes.toolbar} /> <MusicGrid data={data} activatePlayer={this.activatePlayer}/>
+          <div className={classes.toolbar} />
+           {/* <MusicGrid data={data} activatePlayer={this.activatePlayer}/> */}
         </main>
         { this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL}/>}
       </div>
