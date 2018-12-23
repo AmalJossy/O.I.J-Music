@@ -128,7 +128,9 @@ class SearchDrop extends React.Component {
       }
     })
   }
-
+  handlePick(title){
+    this.props.toggleResultsView(title)
+  }
   render() {
     const { classes } = this.props;
     const { anchorEl, open, placement } = this.state;
@@ -159,7 +161,7 @@ class SearchDrop extends React.Component {
         <Popper className={classes.popper} id={id} open={open} anchorEl={anchorEl} placement='bottom-start' transition>
           <List className={classes.resultList}>
             {this.state.results && this.state.results.map((result, index) => (
-              <ListItem key={index} className={classes.resultItem} onClick={() => console.log(result.title)}>
+              <ListItem key={index} className={classes.resultItem} onClick={() => this.handlePick(result.title)}>
                 <ListItemText >{result.title}</ListItemText>
               </ListItem>
             ))}

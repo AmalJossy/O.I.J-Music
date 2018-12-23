@@ -28,7 +28,6 @@ function MusicGrid(props) {
     <div>
       {data.map(listData => {
         switch (listData.type) {
-          case "Dynamic":
           case "songs":
             return (
               <div key={listData.id} >

@@ -5,14 +5,14 @@ const api = express.Router()
 const request = require("request");
 const path = require('path');
 const m3u8stream = require('m3u8stream')
-const { HOME_URL, IMAGE_URL, AUTO_URL, STREAM_URL } = require('../config')
+const { HOME_URL, IMAGE_URL, AUTO_URL, STREAM_URL, SEARCH_URL } = require('../config')
 const home = require('../OFFLINEDATA/home.json');
 app.use(express.static(path.resolve(__dirname, 'client/dist')));
 api.get("/languages/:language", (req, res) => {
   let info = {};
   const language = req.params.language.toLowerCase();
   try {
-    request(HOME_URL + language, (error, response, body) => {
+    request(`${HOME_URL}/${language}`, (error, response, body) => {
       if (!error && response.statusCode == 200) {
         info = JSON.parse(body).result.data;
       }
@@ -28,8 +28,19 @@ api.get("/languages/:language", (req, res) => {
 api.get("/instant/:query", (req, res) => {
   let info = {};
   const query = req.params.query;
-  console.log(query);
-  request(AUTO_URL + query, (error, response, body) => {
+  // console.log(query);
+  request(`${AUTO_URL}/${query}`, (error, response, body) => {
+    if (!error && response.statusCode == 200) {
+      info = JSON.parse(body).result.data;
+    }
+    res.send(info);
+  });
+});
+api.get("/search/:title/:language", (req, res) => {
+  let info = {};
+  const {title , language} = req.params;
+  // console.log(query);
+  request(`${SEARCH_URL}/${title}/${language}`, (error, response, body) => {
     if (!error && response.statusCode == 200) {
       info = JSON.parse(body).result.data;
     }

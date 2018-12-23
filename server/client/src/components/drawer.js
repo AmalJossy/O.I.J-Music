@@ -36,22 +36,22 @@ class ResponsiveDrawer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      language: 'Malayalam',
       data: [],
       results: [],
       isLoading: true,
-      isSearching: false,
+      showResults: false,
       mobileOpen: false,
       networkError: false,
       playerOpen: false,
     };
     this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
-    this.handleSearchClear = this.handleSearchClear.bind(this);
+    this.toggleResultsView = this.toggleResultsView.bind(this);
     this.activatePlayer=this.activatePlayer.bind(this);
   }
 
   componentDidMount() {
-    fetch("/api/languages/malayalam")
+    fetch(`/api/languages/${this.state.language}`)
       .then(response => response.json())
       .then(data => this.setState({ isLoading:false, data: data }))
       .catch(this.setState({networkError:true}));;
@@ -59,13 +59,13 @@ class ResponsiveDrawer extends React.Component {
   handleDrawerToggle() {
     this.setState(state => ({ mobileOpen: !state.mobileOpen }));
   }
-  handleSearch() {
-    this.setState({isSearching:true});
-    this.setState({results:["hello","world"]});//temporary
-  }
-  handleSearchClear(){
-    this.setState({isSearching:false});
-    this.setState({results:[]});
+  toggleResultsView(title){
+    this.setState({showResults:true})
+    fetch(`/api/search/${title}/${this.state.language}`)
+    .then(response => response.json())
+    .then(data => this.setState({results:data}))
+    .catch(this.setState({networkError:true}));;
+    // console.log(`/api/search/${title}/${this.state.language}`)
   }
   activatePlayer(id,title,image,artist){
     const [song,album,_v]= id.split('_');
@@ -77,7 +77,7 @@ class ResponsiveDrawer extends React.Component {
   }
   render() {
     const { classes, theme } = this.props;
-    const { data } = this.state;
+    const { data , showResults} = this.state;
     const drawer = (
       <div>
         <div className={classes.toolbar} />
@@ -103,8 +103,7 @@ class ResponsiveDrawer extends React.Component {
       <div className={classes.root}>
         <AppBarWithSearch 
          handleDrawerToggle={this.handleDrawerToggle}
-         handleSearch={this.handleSearch}
-         handleSearchClear={this.handleSearchClear}/>
+         toggleResultsView={this.toggleResultsView}/>
         <nav className={classes.drawer}>
           <Hidden smUp implementation="css">
             <Drawer
@@ -137,8 +136,7 @@ class ResponsiveDrawer extends React.Component {
         </nav>
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <div style={{width:'200px',height:'200px',backgroundColor:'blue',display: 'none'}}></div>
-           <MusicGrid data={data} activatePlayer={this.activatePlayer}/>
+           <MusicGrid data={data} display={!showResults} activatePlayer={this.activatePlayer}/>
         </main>
         { this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL}/>}
       </div>

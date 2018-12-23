@@ -83,7 +83,7 @@ const styles = (theme) => ({
 })
 
 const AppBarWithSearch = (props) => {
-    let { classes, handleDrawerToggle, handleSearch, handleSearchClear } = props;
+    let { classes, handleDrawerToggle, toggleResultsView} = props;
     return <AppBar className={classes.appBar}>
         <Toolbar>
             <IconButton
@@ -98,7 +98,7 @@ const AppBarWithSearch = (props) => {
                 OijMusic
                 </Typography>
             <div className={classes.grow} />
-            <SearchDrop className={classes.search} />
+            <SearchDrop className={classes.search} toggleResultsView={toggleResultsView} />
             {/* <div className={classes.search}>
                 <InputBase
                     placeholder="Search…"
@@ -106,14 +106,14 @@ const AppBarWithSearch = (props) => {
                         root: classes.inputRoot,
                         input: classes.inputInput,
                     }}
-                    onFocus={handleSearch}
+                    onFocus={handleResults}
                     startAdornment={
                         <InputAdornment className={classes.searchIcon} position="start">
                             <SearchIcon />
                         </InputAdornment>}
                     endAdornment={
                         <InputAdornment className={classes.closeIcon} position="end">
-                            <CloseIcon onClick={handleSearchClear} />
+                            <CloseIcon onClick={handleResultsClear} />
                         </InputAdornment>}
                 />
             </div> */}
