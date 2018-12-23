@@ -60,6 +60,10 @@ class ResponsiveDrawer extends React.Component {
     this.setState(state => ({ mobileOpen: !state.mobileOpen }));
   }
   toggleResultsView(title){
+    if(!title){
+      this.setState({showResults:false, results:[]});
+      return;
+    }
     this.setState({showResults:true})
     fetch(`/api/search/${title}/${this.state.language}`)
     .then(response => response.json())
@@ -136,7 +140,9 @@ class ResponsiveDrawer extends React.Component {
         </nav>
         <main className={classes.content}>
           <div className={classes.toolbar} />
-           <MusicGrid data={data} display={!showResults} activatePlayer={this.activatePlayer}/>
+          <div style={{display: showResults ? 'none' : 'block'}}>
+           <MusicGrid data={data} activatePlayer={this.activatePlayer}/>
+           </div>
         </main>
         { this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL}/>}
       </div>

@@ -120,6 +120,7 @@ class SearchDrop extends React.Component {
       placement: null,
       results: [],
     })
+    this.props.toggleResultsView(null)
   }
   toggleSearching(){
     this.setState(state=>{
