@@ -2,18 +2,18 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Popper from '@material-ui/core/Popper';
 import Typography from '@material-ui/core/Typography';
-import Fade from '@material-ui/core/Fade';
-import Paper from '@material-ui/core/Paper';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputBase from '@material-ui/core/InputBase';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import _ from "lodash";
 
 const styles = theme => ({
-  typography: {
-    padding: theme.spacing.unit * 2,
-  },
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius * 15,
@@ -61,6 +61,15 @@ const styles = theme => ({
       },
     },
   },
+  popper: {
+    width: 360,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+  },
+  resultItem: {
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    }
+  }
 });
 
 class SearchDrop extends React.Component {
@@ -69,32 +78,62 @@ class SearchDrop extends React.Component {
     this.state = {
       anchorEl: null,
       open: false,
+      placement: null,
+      query: "",
       results: [],
+      networkError: false,
+      isSearching: false,
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchClear = this.handleSearchClear.bind(this);
-    console.log(this.handleClick);
+    this.getResults = this.getResults.bind(this);
+    this.toggleSearching = this.toggleSearching.bind(this);
+    this.debouncedGetResults = _.debounce(this.getResults, 500);
+  }
+
+  getResults() {
+    if (!this.state.query) {
+      this.debouncedGetResults.cancel();
+      return;
+    }
+    this.setState({results: []})
+    fetch(`/api/instant/${this.state.query}`)
+      .then(response => response.json())
+      .then(data => this.setState({ results: data }))
+      .catch(this.setState({ networkError: true }));;
   }
 
   handleSearch(event) {
     const { currentTarget } = event;
+    const input = event.target.value;
     this.setState({
       anchorEl: currentTarget,
       open: true,
-      results: ['a', 'b', 'c'],
+      placement: 'bottom-end',
+      query: input,
     });
+    this.debouncedGetResults();
   };
   handleSearchClear(event) {
     this.setState({
+      open: false,
+      placement: null,
       results: [],
     })
-    console.log(event.target)
+  }
+  toggleSearching(){
+    this.setState(state=>{
+      return {
+        isSearching: !state.isSearching
+      }
+    })
   }
 
   render() {
     const { classes } = this.props;
-    const { anchorEl, open } = this.state;
+    const { anchorEl, open, placement } = this.state;
     const id = open ? 'simple-popper' : null;
+    console.log(this.state.results)
     return (
       <div>
         <div className={classes.search}>
@@ -104,6 +143,8 @@ class SearchDrop extends React.Component {
               root: classes.inputRoot,
               input: classes.inputInput,
             }}
+            onFocus={this.toggleSearching}
+            onBlur={this.toggleSearching}
             onInput={this.handleSearch}
             startAdornment={
               <InputAdornment className={classes.searchIcon} position="start">
@@ -115,16 +156,15 @@ class SearchDrop extends React.Component {
               </InputAdornment>}
           />
         </div>
-        <Popper id={id} open={open} anchorEl={anchorEl} transition>
-          {({ TransitionProps }) => (
-            <Fade {...TransitionProps} timeout={350}>
-              <Paper>
-                {this.state.results.map((result, index) => (
-                  <Typography key={index} className={classes.typography}>one result={result}.</Typography>
-                ))}
-              </Paper>
-            </Fade>
-          )}
+        <Popper className={classes.popper} id={id} open={open} anchorEl={anchorEl} placement='bottom-start' transition>
+          <List className={classes.resultList}>
+            {this.state.results && this.state.results.map((result, index) => (
+              <ListItem key={index} className={classes.resultItem} onClick={() => console.log(result.title)}>
+                <ListItemText >{result.title}</ListItemText>
+              </ListItem>
+            ))}
+            {this.state.isSearching && this.state.results.length==0 && <ListItem><CircularProgress  /></ListItem>}
+          </List>
         </Popper>
       </div>
     );

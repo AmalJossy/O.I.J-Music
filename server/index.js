@@ -1,29 +1,35 @@
 const express = require("express");
 const PORT = "3000";
 const app = express();
-const api=express.Router()
+const api = express.Router()
 const request = require("request");
-const path= require('path');
-const m3u8stream  = require('m3u8stream')
-const { HOME_URL ,IMAGE_URL, AUTO_URL, STREAM_URL} = require('../config')
+const path = require('path');
+const m3u8stream = require('m3u8stream')
+const { HOME_URL, IMAGE_URL, AUTO_URL, STREAM_URL } = require('../config')
 const home = require('../OFFLINEDATA/home.json');
 app.use(express.static(path.resolve(__dirname, 'client/dist')));
 api.get("/languages/:language", (req, res) => {
   let info = {};
-  const language=req.params.language.toLowerCase();
-  request(HOME_URL+language, (error, response, body) => {
-    if (!error && response.statusCode == 200) {
-      info = JSON.parse(body).result.data;
-    }
-    res.send(info);
-  });
-  console.log(home.result.data);
+  const language = req.params.language.toLowerCase();
+  try {
+    request(HOME_URL + language, (error, response, body) => {
+      if (!error && response.statusCode == 200) {
+        info = JSON.parse(body).result.data;
+      }
+      res.send(info);
+    });
+  }
+  catch(err){
+    console.log(err);
+    res.sendStatus(500);
+  }
   // res.send(home.result.data);
 });
 api.get("/instant/:query", (req, res) => {
   let info = {};
-  const query=req.params.query;
-  request(AUTO_URL+query, (error, response, body) => {
+  const query = req.params.query;
+  console.log(query);
+  request(AUTO_URL + query, (error, response, body) => {
     if (!error && response.statusCode == 200) {
       info = JSON.parse(body).result.data;
     }
@@ -57,27 +63,27 @@ api.get("/instant/:query", (req, res) => {
 //     // res.sendStatus(404);
 //   });
 // })
-api.get("/images/*",(req,res)=>{
-  let url=IMAGE_URL+req.url;
+api.get("/images/*", (req, res) => {
+  let url = IMAGE_URL + req.url;
   console.log(url);
   req.pipe(request(url)).pipe(res);
   // res.sendFile(path.resolve(__dirname,'../OFFLINEDATA/200x200.jpeg'));
 })
-api.get("/stream/*",(req,res)=>{
-  let url=STREAM_URL+req.url.slice(7);
+api.get("/stream/*", (req, res) => {
+  let url = STREAM_URL + req.url.slice(7);
   console.log(url);
   req.pipe(request(url)).pipe(res);
 })
-api.get("/download/*",(req,res)=>{
-  let url=STREAM_URL+req.url.slice(9);
+api.get("/download/*", (req, res) => {
+  let url = STREAM_URL + req.url.slice(9);
   console.log(url);
   res.set('Content-Type', 'audio/mpeg3');
   res.set('Content-Disposition', 'attachment; filename="audio.MP3"')
   m3u8stream(url).pipe(res);
 })
-app.use("/api",api)
-app.get('*', (req,res) =>{
-    res.sendFile(path.resolve(__dirname,'client/dist/index.html'));
+app.use("/api", api)
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'client/dist/index.html'));
 });
 app.listen(PORT, () => {
   console.log("Running on ", PORT);
