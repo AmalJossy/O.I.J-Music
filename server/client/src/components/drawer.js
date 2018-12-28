@@ -5,9 +5,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
+import _ from 'lodash';
 import MusicGrid from './grid';
 import AppBarWithSearch from './appbar';
 import FloatingPlayer from './floatingplayer';
+import ResultGrid from './resultgrid';
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -28,6 +30,10 @@ const styles = theme => ({
   },
   content: {
     flexGrow: 1,
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: '100px',
+      marginRight: '100px',
+    },
     padding: theme.spacing.unit * 3,
   },
 });
@@ -38,50 +44,46 @@ class ResponsiveDrawer extends React.Component {
     this.state = {
       language: 'Malayalam',
       data: [],
-      results: [],
+      results: {},
       isLoading: true,
       showResults: false,
-      mobileOpen: false,
       networkError: false,
       playerOpen: false,
     };
-    this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
     this.toggleResultsView = this.toggleResultsView.bind(this);
-    this.activatePlayer=this.activatePlayer.bind(this);
+    this.activatePlayer = this.activatePlayer.bind(this);
   }
 
   componentDidMount() {
     fetch(`/api/languages/${this.state.language}`)
       .then(response => response.json())
-      .then(data => this.setState({ isLoading:false, data: data }))
-      .catch(this.setState({networkError:true}));;
+      .then(data => this.setState({ isLoading: false, data: data }))
+      .catch(this.setState({ networkError: true }));;
+    // console.log(this.state.results)
   }
-  handleDrawerToggle() {
-    this.setState(state => ({ mobileOpen: !state.mobileOpen }));
-  }
-  toggleResultsView(title){
-    if(!title){
-      this.setState({showResults:false, results:[]});
+  toggleResultsView(title) {
+    if (!title) {
+      this.setState({ showResults: false, results: {} });
       return;
     }
-    this.setState({showResults:true})
+    this.setState({ showResults: true })
     fetch(`/api/search/${title}/${this.state.language}`)
-    .then(response => response.json())
-    .then(data => this.setState({results:data}))
-    .catch(this.setState({networkError:true}));;
+      .then(response => response.json())
+      .then(data => { this.setState({ results: data }); console.log(this.state.results) })
+      .catch(this.setState({ networkError: true }));;
     // console.log(`/api/search/${title}/${this.state.language}`)
   }
-  activatePlayer(id,title,image,artist){
-    const [song,album,_v]= id.split('_');
-    this.setState({playerOpen:true});
-    this.songURL=`/api/stream/${song}/${album}/${id}_h.smil/chunklist_b128000_ao.m3u8`;
-    this.playerParams={
-      title,image,artist
+  activatePlayer(id, title, image, artist) {
+    const [song, album, _v] = id.split('_');
+    this.setState({ playerOpen: true });
+    this.songURL = `/api/stream/${song}/${album}/${id}_h.smil/chunklist_b128000_ao.m3u8`;
+    this.playerParams = {
+      title, image, artist
     }
   }
   render() {
     const { classes, theme } = this.props;
-    const { data , showResults} = this.state;
+    const { data, showResults, results } = this.state;
     const drawer = (
       <div>
         <div className={classes.toolbar} />
@@ -105,46 +107,18 @@ class ResponsiveDrawer extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBarWithSearch 
-         handleDrawerToggle={this.handleDrawerToggle}
-         toggleResultsView={this.toggleResultsView}/>
-        <nav className={classes.drawer}>
-          <Hidden smUp implementation="css">
-            <Drawer
-              container={this.props.container}
-              variant="temporary"
-              anchor={theme.direction === "rtl" ? "right" : "left"}
-              open={this.state.mobileOpen}
-              onClose={this.handleDrawerToggle}
-              classes={{
-                paper: classes.drawerPaper
-              }}
-              ModalProps={{
-                keepMounted: true // Better open performance on mobile.
-              }}
-            >
-              {drawer}
-            </Drawer>
-          </Hidden>
-          <Hidden xsDown implementation="css">
-            <Drawer
-              variant="permanent"
-              open
-              classes={{
-                paper: classes.drawerPaper
-              }}
-            >
-              {drawer}
-            </Drawer>
-          </Hidden>
-        </nav>
+        <AppBarWithSearch toggleResultsView={this.toggleResultsView} />
+
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <div style={{display: showResults ? 'none' : 'block'}}>
-           <MusicGrid data={data} activatePlayer={this.activatePlayer}/>
-           </div>
+          <div style={{ display: showResults ? 'none' : 'block' }}>
+            <MusicGrid data={data} activatePlayer={this.activatePlayer} />
+          </div>
+          <div style={{ display: showResults ? 'block' : 'none' }}>
+            {_.isEmpty(results) ? <div>No Results</div> : <ResultGrid data={results} />}
+          </div>
         </main>
-        { this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL}/>}
+        {this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL} />}
       </div>
     );
   }

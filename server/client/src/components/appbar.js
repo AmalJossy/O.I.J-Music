@@ -13,15 +13,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 import SearchDrop from "./SearchDrop";
 
-const drawerWidth = 240;
 
 const styles = (theme) => ({
     appBar: {
         background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-        marginLeft: drawerWidth,
-        [theme.breakpoints.up('sm')]: {
-            width: `calc(100% - ${drawerWidth}px)`,
-        },
     },
     menuButton: {
         marginRight: 20,
@@ -83,17 +78,9 @@ const styles = (theme) => ({
 })
 
 const AppBarWithSearch = (props) => {
-    let { classes, handleDrawerToggle, toggleResultsView} = props;
+    let { classes, toggleResultsView} = props;
     return <AppBar className={classes.appBar}>
         <Toolbar>
-            <IconButton
-                color="inherit"
-                aria-label="Open drawer"
-                onClick={handleDrawerToggle}
-                className={classes.menuButton}
-            >
-                <MenuIcon />
-            </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
                 OijMusic
                 </Typography>

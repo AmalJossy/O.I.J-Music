@@ -23,7 +23,7 @@ const styles = theme => ({
 
 function MusicGrid(props) {
   const { classes, data, activatePlayer } = props;
-  console.log("Grid render");
+  // console.log("Grid render");
   return (
     <div>
       {data.map(listData => {

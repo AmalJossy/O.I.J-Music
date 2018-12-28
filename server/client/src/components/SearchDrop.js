@@ -136,7 +136,7 @@ class SearchDrop extends React.Component {
     const { classes } = this.props;
     const { anchorEl, open, placement } = this.state;
     const id = open ? 'simple-popper' : null;
-    console.log(this.state.results)
+    // console.log(this.state.results)
     return (
       <div>
         <div className={classes.search}>

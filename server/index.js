@@ -76,18 +76,18 @@ api.get("/search/:title/:language", (req, res) => {
 // })
 api.get("/images/*", (req, res) => {
   let url = IMAGE_URL + req.url;
-  console.log(url);
+  // console.log(url);
   req.pipe(request(url)).pipe(res);
   // res.sendFile(path.resolve(__dirname,'../OFFLINEDATA/200x200.jpeg'));
 })
 api.get("/stream/*", (req, res) => {
   let url = STREAM_URL + req.url.slice(7);
-  console.log(url);
+  // console.log(url);
   req.pipe(request(url)).pipe(res);
 })
 api.get("/download/*", (req, res) => {
   let url = STREAM_URL + req.url.slice(9);
-  console.log(url);
+  // console.log(url);
   res.set('Content-Type', 'audio/mpeg3');
   res.set('Content-Disposition', 'attachment; filename="audio.MP3"')
   m3u8stream(url).pipe(res);
