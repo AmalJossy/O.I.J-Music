@@ -29,6 +29,7 @@ export default withStyles(styles)((props) => {
     const albums = props.data["Albums"];
     const playlists = props.data["Playlists"];
     const radio = props.data["Radio"];
+    const activatePlayer=props.activatePlayer;
     return <div>
         <Badge color="primary" badgeContent={best.length} >
             <Typography variant="h6" gutterBottom>Best Match</Typography>

@@ -1,17 +1,10 @@
 import React from "react";
 import AppBar from '@material-ui/core/AppBar';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
-// import { fade } from '@material-ui/core/styles/colorManipulator';
-// import InputAdornment from '@material-ui/core/InputAdornment';
-// import InputBase from '@material-ui/core/InputBase';
-// import CloseIcon from '@material-ui/icons/Close';
-// import SearchIcon from '@material-ui/icons/Search';
 
-import SearchDrop from "./SearchDrop";
+import SearchDrop from "./searchdrop";
 
 
 const styles = (theme) => ({

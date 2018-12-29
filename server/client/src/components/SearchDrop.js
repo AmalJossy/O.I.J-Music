@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Popper from '@material-ui/core/Popper';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import InputBase from '@material-ui/core/InputBase';
@@ -61,13 +62,17 @@ const styles = theme => ({
       },
     },
   },
+  loadAnim: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
   popper: {
     width: 360,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    backgroundColor: '#FF8E53'
   },
   resultItem: {
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: '#FE6B8B'
     }
   }
 });
@@ -82,7 +87,6 @@ class SearchDrop extends React.Component {
       query: "",
       results: [],
       networkError: false,
-      isSearching: false,
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchClear = this.handleSearchClear.bind(this);
@@ -96,10 +100,10 @@ class SearchDrop extends React.Component {
       this.debouncedGetResults.cancel();
       return;
     }
-    this.setState({results: []})
+    this.setState({ results: [] })
     fetch(`/api/instant/${this.state.query}`)
       .then(response => response.json())
-      .then(data => this.setState({ results: data }))
+      .then(data => this.setState({ results: data, networkError: false }))
       .catch(this.setState({ networkError: true }));;
   }
 
@@ -109,32 +113,37 @@ class SearchDrop extends React.Component {
     this.setState({
       anchorEl: currentTarget,
       open: true,
-      placement: 'bottom-end',
+      placement: 'bottom-start',
       query: input,
     });
     this.debouncedGetResults();
   };
   handleSearchClear(event) {
     this.setState({
+      anchorEl: null,
       open: false,
-      placement: null,
+      query: "",
       results: [],
+      networkError: false,
     })
     this.props.toggleResultsView(null)
   }
-  toggleSearching(){
-    this.setState(state=>{
+  toggleSearching() {
+    this.setState(state => {
       return {
-        isSearching: !state.isSearching
+        open: !state.open
       }
     })
+    // console.log('toggle'); console.log(this.state);
   }
-  handlePick(title){
+  handlePick(title) {
+    // console.log(title,' fire')
+    this.toggleSearching()
     this.props.toggleResultsView(title)
   }
   render() {
     const { classes } = this.props;
-    const { anchorEl, open, placement } = this.state;
+    const { anchorEl, open, placement, query } = this.state;
     const id = open ? 'simple-popper' : null;
     // console.log(this.state.results)
     return (
@@ -147,8 +156,8 @@ class SearchDrop extends React.Component {
               input: classes.inputInput,
             }}
             onFocus={this.toggleSearching}
-            onBlur={this.toggleSearching}
             onInput={this.handleSearch}
+            value={query}
             startAdornment={
               <InputAdornment className={classes.searchIcon} position="start">
                 <SearchIcon />
@@ -159,14 +168,14 @@ class SearchDrop extends React.Component {
               </InputAdornment>}
           />
         </div>
-        <Popper className={classes.popper} id={id} open={open} anchorEl={anchorEl} placement='bottom-start' transition>
+        <Popper className={classes.popper} id={id} open={open} anchorEl={anchorEl} placement={placement} onBlur={this.toggleSearching} >
           <List className={classes.resultList}>
             {this.state.results && this.state.results.map((result, index) => (
-              <ListItem key={index} className={classes.resultItem} onClick={() => this.handlePick(result.title)}>
+              <ListItem key={index} className={classes.resultItem} onClick={() => {this.handlePick(result.title)}} >
                 <ListItemText >{result.title}</ListItemText>
               </ListItem>
             ))}
-            {this.state.isSearching && this.state.results.length==0 && <ListItem><CircularProgress  /></ListItem>}
+            {this.state.open && this.state.results.length==0 && <ListItem><CircularProgress className={classes.loadAnim} /></ListItem>}
           </List>
         </Popper>
       </div>
