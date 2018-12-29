@@ -35,6 +35,7 @@ class ResponsiveDrawer extends React.Component {
     };
     this.toggleResultsView = this.toggleResultsView.bind(this);
     this.activatePlayer = this.activatePlayer.bind(this);
+    this.closePlayer = this.closePlayer.bind(this);
   }
 
   componentDidMount() {
@@ -65,6 +66,9 @@ class ResponsiveDrawer extends React.Component {
       title, image, artist
     }
   }
+  closePlayer(){
+    this.setState({ playerOpen: false });
+  }
   render() {
     const { classes } = this.props;
     const { data, showResults, results } = this.state;
@@ -82,7 +86,7 @@ class ResponsiveDrawer extends React.Component {
             {_.isEmpty(results) ? <div>No Results</div> : <ResultGrid data={results} activatePlayer={this.activatePlayer} />}
           </div>
         </main>
-        {this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL} />}
+        {this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL} closePlayer={this.closePlayer} />}
       </div>
     );
   }

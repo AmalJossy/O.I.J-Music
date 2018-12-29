@@ -7,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
+import Close from '@material-ui/icons/CloseTwoTone';
 
 import Hls from 'hls.js'
 const styles = theme => ({
@@ -22,6 +23,7 @@ const styles = theme => ({
     },
     content: {
         flex: '1 0 auto',
+        position: 'relative',
     },
     cover: {
         width: 151,
@@ -35,6 +37,11 @@ const styles = theme => ({
     playIcon: {
         height: 38,
         width: 38,
+    },
+    closeIcon: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
     },
     video: {
         display: 'none',
@@ -50,13 +57,23 @@ class MediaControlCard extends Component {
         // this.isPlaying=false;
         this.hls = null;
         this.videoRef = React.createRef();
+        this.stopAndClose=this.stopAndClose.bind(this);
     }
     componentDidUpdate(prevProps) {
-        if(this.props!=prevProps){
+        if (this.props != prevProps) {
             this._initPlayer();
         }
     }
-
+    shouldComponentUpdate(nextProps, nextState) {
+        let shouldUpdate = false;
+        if (this.state.isPlaying !== nextState.isPlaying) {
+            shouldUpdate = true;
+        }
+        if (this.props.url !== nextProps.url) {
+            shouldUpdate = true;
+        }
+        return shouldUpdate;
+    }
     componentDidMount() {
         this._initPlayer();
     }
@@ -75,28 +92,30 @@ class MediaControlCard extends Component {
         }
         let url = this.props.url;
         let video = this.videoRef.current;
-        this.video=video;
-        console.log(this.videoRef.current)
+        this.video = video;
         let hls = new Hls();
 
         hls.loadSource(url);
         hls.attachMedia(video);
-        this.setState({isPlaying: true});
+        this.setState({ isPlaying: true });
         video.play();
 
         this.hls = hls;
     }
     togglePlayback() {
-        let video=this.video;
+        let video = this.video;
         if (this.state.isPlaying) {
             this.setState({ isPlaying: false });
             video.pause();
         }
         if (!this.state.isPlaying) {
             this.setState({ isPlaying: true });
-            console.log("was not playing")
             video.play();
         }
+    }
+    stopAndClose(){
+        this.togglePlayback();
+        this.props.closePlayer();
     }
     render() {
         const classes = this.props.classes;
@@ -127,6 +146,7 @@ class MediaControlCard extends Component {
                     image={imageURL}
                     title={title}
                 />
+                <IconButton className={classes.closeIcon} onClick={this.stopAndClose}><Close /></IconButton>
             </Card>
         );
     }
