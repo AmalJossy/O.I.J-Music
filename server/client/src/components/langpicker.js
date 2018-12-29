@@ -1,101 +1,98 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Avatar from '@material-ui/core/Avatar';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
-import PersonIcon from '@material-ui/icons/Person';
-import AddIcon from '@material-ui/icons/Add';
-import Typography from '@material-ui/core/Typography';
-import blue from '@material-ui/core/colors/blue';
+import Chip from '@material-ui/core/Chip';
+import LangIcon from '@material-ui/icons/Language';
 
-const languages = ['English', 'Malayalam','Tamil','Hindi'];
+const languages = ['English', 'Malayalam', 'Tamil', 'Hindi'];
 const styles = {
-  avatar: {
-    backgroundColor: blue[100],
-    color: blue[600],
-  },
+    chip:{
+        position: 'fixed',
+        bottom: 5,
+        left: 5,
+    }
 };
 
-class LangPicker extends React.Component {
-  handleClose = () => {
-    this.props.onClose(this.props.selectedValue);
-  };
+class LangPickerDialog extends Component {
+    constructor(props) {
+        super(props);
+    }
+    handleClose(){
+        this.props.onClose(this.props.selectedValue);
+    };
 
-  handleListItemClick = value => {
-    this.props.onClose(value);
-  };
+    handleListItemClick(value) {
+        this.props.onClose(value);
+    };
 
-  render() {
-    const { classes, onClose, selectedValue, ...other } = this.props;
+    render() {
 
-    return (
-      <Dialog onClose={this.handleClose} aria-labelledby="language-picker" {...other}>
-        <DialogTitle id="language-picker">Music by langauge</DialogTitle>
-        <div>
-          <List>
-            {languages.map(language => (
-              <ListItem button onClick={() => this.handleListItemClick(language)} key={language}>
-                <ListItemAvatar>
-                  <Avatar className={classes.avatar}>
-                    <PersonIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={language} />
-              </ListItem>
-            ))}
-          </List>
-        </div>
-      </Dialog>
-    );
-  }
+        return (
+            <Dialog onClose={this.handleClose} aria-labelledby="language-picker" open={this.props.open}>
+                <DialogTitle id="language-picker">Music by langauge</DialogTitle>
+                <div>
+                    <List>
+                        {languages.map(language => (
+                            <ListItem button onClick={() => this.handleListItemClick(language)} key={language}>
+                                <ListItemText primary={language} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </div>
+            </Dialog>
+        );
+    }
 }
 
-LangPicker.propTypes = {
-  classes: PropTypes.object.isRequired,
-  onClose: PropTypes.func,
-  selectedValue: PropTypes.string,
-};
 
-const LangPickerWrapped = withStyles(styles)(LangPicker);
+class LangPicker extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            open: false,
+            selectedValue: languages[0],
+        };
+        this.handleClickOpen = this.handleClickOpen.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+    }
 
-class LangPickerDemo extends React.Component {
-  state = {
-    open: false,
-    selectedValue: languages[1],
-  };
+    handleClickOpen() {
+        console.log("handleclickopen")
+        this.setState({
+            open: true,
+        });
+    };
 
-  handleClickOpen = () => {
-    this.setState({
-      open: true,
-    });
-  };
+    handleClose(value){
+        this.setState({ selectedValue: value, open: false });
+        this.props.onPick(value)
+    };
 
-  handleClose = value => {
-    this.setState({ selectedValue: value, open: false });
-  };
-
-  render() {
-    return (
-      <div>
-        <Typography variant="subtitle1">Selected: {this.state.selectedValue}</Typography>
-        <br />
-        <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
-          Open Language Picker
-        </Button>
-        <LangPickerWrapped
-          selectedValue={this.state.selectedValue}
-          open={this.state.open}
-          onClose={this.handleClose}
-        />
-      </div>
-    );
-  }
+    render() {
+        const {classes}=this.props;
+        return (
+            <div>
+                <Chip
+                    icon={<LangIcon />}
+                    label={this.state.selectedValue}
+                    onClick={this.handleClickOpen}
+                    clickable
+                    className={classes.chip}
+                    color="primary"
+                />
+                <LangPickerDialog
+                    selectedValue={this.state.selectedValue}
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                />
+            </div>
+        );
+    }
 }
 
-export default LangPickerDemo;
+export default withStyles(styles)(LangPicker);

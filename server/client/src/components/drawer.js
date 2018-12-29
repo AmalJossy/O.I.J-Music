@@ -5,6 +5,7 @@ import MusicGrid from './grid';
 import AppBarWithSearch from './appbar';
 import FloatingPlayer from './floatingplayer';
 import ResultGrid from './resultgrid';
+import LangPicker from "./langpicker";
 
 const styles = theme => ({
   root: {
@@ -33,12 +34,17 @@ class ResponsiveDrawer extends React.Component {
       networkError: false,
       playerOpen: false,
     };
+    this.loadData=this.loadData.bind(this);
     this.toggleResultsView = this.toggleResultsView.bind(this);
     this.activatePlayer = this.activatePlayer.bind(this);
     this.closePlayer = this.closePlayer.bind(this);
+    this.pickLanguage = this.pickLanguage.bind(this);
   }
 
   componentDidMount() {
+    this.loadData();
+  }
+  loadData(){
     fetch(`/api/languages/${this.state.language}`)
       .then(response => response.json())
       .then(data => this.setState({ isLoading: false, data: data }))
@@ -47,7 +53,6 @@ class ResponsiveDrawer extends React.Component {
   toggleResultsView(title) {
     if (!title) {
       this.setState({ showResults: false, results: {} });
-      // return;
     }
     else {
       this.setState({ showResults: true })
@@ -55,7 +60,6 @@ class ResponsiveDrawer extends React.Component {
         .then(response => response.json())
         .then(data => { this.setState({ results: data }); console.log(this.state.results) })
         .catch(this.setState({ networkError: true }));;
-      // console.log(`/api/search/${title}/${this.state.language}`)
     }
   }
   activatePlayer(id, title, image, artist) {
@@ -69,10 +73,16 @@ class ResponsiveDrawer extends React.Component {
   closePlayer(){
     this.setState({ playerOpen: false });
   }
+  pickLanguage(language){
+    if(language===this.state.language){
+      return null;
+    }
+    this.setState({language:language},this.loadData);
+  }
   render() {
     const { classes } = this.props;
     const { data, showResults, results } = this.state;
-    console.log("render");
+    // console.log("render",this.state.language);
     return (
       <div className={classes.root}>
         <AppBarWithSearch toggleResultsView={this.toggleResultsView} />
@@ -87,6 +97,7 @@ class ResponsiveDrawer extends React.Component {
           </div>
         </main>
         {this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL} closePlayer={this.closePlayer} />}
+        <LangPicker onPick={this.pickLanguage}/>
       </div>
     );
   }
