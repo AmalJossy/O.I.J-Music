@@ -1,11 +1,12 @@
 {
-  "name": "OijMusic",
+  "name": "O.I.J Music",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "serve": "node server/index.js",
-    "build-client": "webpack"
+    "build": "webpack",
+    "build-watch": "webpack --watch"
   },
   "devDependencies": {
     "babel-core": "^6.10.4",

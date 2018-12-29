@@ -82,7 +82,7 @@ const AppBarWithSearch = (props) => {
     return <AppBar className={classes.appBar}>
         <Toolbar>
             <Typography variant="h6" color="inherit" noWrap>
-                OijMusic
+                O.I.J Music
                 </Typography>
             <div className={classes.grow} />
             <SearchDrop className={classes.search} toggleResultsView={toggleResultsView} />
