@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "serve": "node functions/index.js",
-    "build": "webpack",
+    "start": "node functions/index.js",
+    "postinstall": "webpack",
     "watch": "webpack --watch"
   },
   "devDependencies": {
