@@ -1,10 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: './server/client/src/app.js',
+  entry: './app/src/app.js',
   mode: 'development',
   output: {
-    path: path.resolve(__dirname, 'server/client/dist'),
+    path: path.resolve(__dirname, 'app/dist'),
     filename: 'bundle.js'
   },
   module: {

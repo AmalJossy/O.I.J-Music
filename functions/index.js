@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 const { HOME_URL, IMAGE_URL, AUTO_URL, STREAM_URL, SEARCH_URL } = process.env
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.resolve(__dirname, 'client/dist')));
+app.use(express.static(path.resolve(__dirname, '../app/dist')));
 
 api.get("/languages/:language", (req, res) => {
   let info = {};
@@ -100,7 +100,7 @@ api.get("/download/*", (req, res) => {
 })
 app.use("/api", api)
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client/dist/index.html'));
+  res.sendFile(path.resolve(__dirname, '../app/dist/index.html'));
 });
 app.listen(PORT, () => {
   console.log("Running on ", PORT);
