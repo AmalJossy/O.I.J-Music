@@ -1,5 +1,6 @@
 import React from "react";
 import { withStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import _ from 'lodash';
 import MusicGrid from './grid';
 import AppBarWithSearch from './appbar';
@@ -20,6 +21,14 @@ const styles = theme => ({
     },
     padding: theme.spacing.unit * 3,
   },
+  loadAnim: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0,
+    margin: 'auto',
+  },
 });
 
 class ResponsiveDrawer extends React.Component {
@@ -34,7 +43,7 @@ class ResponsiveDrawer extends React.Component {
       networkError: false,
       playerOpen: false,
     };
-    this.loadData=this.loadData.bind(this);
+    this.loadData = this.loadData.bind(this);
     this.toggleResultsView = this.toggleResultsView.bind(this);
     this.activatePlayer = this.activatePlayer.bind(this);
     this.closePlayer = this.closePlayer.bind(this);
@@ -44,7 +53,7 @@ class ResponsiveDrawer extends React.Component {
   componentDidMount() {
     this.loadData();
   }
-  loadData(){
+  loadData() {
     fetch(`/api/languages/${this.state.language}`)
       .then(response => response.json())
       .then(data => this.setState({ isLoading: false, data: data }))
@@ -55,10 +64,10 @@ class ResponsiveDrawer extends React.Component {
       this.setState({ showResults: false, results: {} });
     }
     else {
-      this.setState({ showResults: true })
+      this.setState({ isLoading: true, showResults: true })
       fetch(`/api/search/${title}/${this.state.language}`)
         .then(response => response.json())
-        .then(data => { this.setState({ results: data }); console.log(this.state.results) })
+        .then(data => { this.setState({ isLoading: false, results: data }); console.log(this.state.results) })
         .catch(this.setState({ networkError: true }));;
     }
   }
@@ -70,18 +79,18 @@ class ResponsiveDrawer extends React.Component {
       title, image, artist
     }
   }
-  closePlayer(){
+  closePlayer() {
     this.setState({ playerOpen: false });
   }
-  pickLanguage(language){
-    if(language===this.state.language){
+  pickLanguage(language) {
+    if (language === this.state.language) {
       return null;
     }
-    this.setState({language:language},this.loadData);
+    this.setState({ language: language }, this.loadData);
   }
   render() {
     const { classes } = this.props;
-    const { data, showResults, results } = this.state;
+    const { isLoading, data, showResults, results } = this.state;
     // console.log("render",this.state.language);
     return (
       <div className={classes.root}>
@@ -93,11 +102,12 @@ class ResponsiveDrawer extends React.Component {
             <MusicGrid data={data} activatePlayer={this.activatePlayer} />
           </div>
           <div style={{ display: showResults ? 'block' : 'none' }}>
-            {_.isEmpty(results) ? <div>No Results</div> : <ResultGrid data={results} activatePlayer={this.activatePlayer} />}
+            {_.isEmpty(results) ? (isLoading || <div>No Results</div>) : <ResultGrid data={results} activatePlayer={this.activatePlayer} />}
           </div>
+          {isLoading && <CircularProgress className={classes.loadAnim} />}
         </main>
         {this.state.playerOpen && <FloatingPlayer playerParams={this.playerParams} url={this.songURL} closePlayer={this.closePlayer} />}
-        <LangPicker onPick={this.pickLanguage}/>
+        <LangPicker onPick={this.pickLanguage} />
       </div>
     );
   }

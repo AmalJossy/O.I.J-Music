@@ -34,7 +34,6 @@ class LangPickerDialog extends Component {
 
         return (
             <Dialog onClose={this.handleClose} aria-labelledby="language-picker" open={this.props.open}>
-                <DialogTitle id="language-picker">Music by langauge</DialogTitle>
                 <div>
                     <List>
                         {languages.map(language => (
@@ -62,7 +61,6 @@ class LangPicker extends Component {
     }
 
     handleClickOpen() {
-        console.log("handleclickopen")
         this.setState({
             open: true,
         });
