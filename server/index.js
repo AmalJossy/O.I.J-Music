@@ -1,13 +1,19 @@
 const express = require("express");
-const PORT = "3000";
 const app = express();
 const api = express.Router()
 const request = require("request");
 const path = require('path');
 const m3u8stream = require('m3u8stream')
-const { HOME_URL, IMAGE_URL, AUTO_URL, STREAM_URL, SEARCH_URL } = require('../config')
-const home = require('../OFFLINEDATA/home.json');
+
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+}
+const { HOME_URL, IMAGE_URL, AUTO_URL, STREAM_URL, SEARCH_URL } = process.env
+const PORT = process.env.PORT || 3000;
+
 app.use(express.static(path.resolve(__dirname, 'client/dist')));
+
 api.get("/languages/:language", (req, res) => {
   let info = {};
   const language = req.params.language.toLowerCase();
