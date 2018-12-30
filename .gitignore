@@ -1,4 +1,4 @@
 node_modules/
 OFFLINEDATA/
-config.js
+app/dist/bundle.js
 .env
